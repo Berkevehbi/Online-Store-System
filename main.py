@@ -23,7 +23,7 @@ def check_user_password(user_password_dict: Dict, username: str, password: str) 
         return False
 
 
-def check_cart_list(cart, product_name):
+def check_cart_list(cart: List, product_name: str) -> bool:
     for i in range(len(cart)):
         if product_name == cart[i][0]:
             cart[i][2] += 1
@@ -31,19 +31,19 @@ def check_cart_list(cart, product_name):
     return False
 
 
-def create_user_account(user_password_dict, username, password):
+def create_user_account(user_password_dict: Dict, username: str, password: str) -> None:
     user_password_dict[username] = password
     print(f"User {username} registered successfully. Please login now.")
 
 
-def calculate_total_price(cart):
+def calculate_total_price(cart: List) -> int:
     total_price = 0
     for product in cart:
         total_price += product[1] * product[2]
     return total_price
 
 
-def print_catalog(catalog):
+def print_catalog(catalog: Dict) -> None:
     for item in catalog:
         print(
             f"{item}: {catalog[item]['Price']} - Stock: {catalog[item]['Stock']}"
@@ -51,7 +51,7 @@ def print_catalog(catalog):
         )
 
 
-def print_cart(cart):
+def print_cart(cart: List) -> None:
     print("Shopping Cart Contents: ")
     total_price = 0
     for i in range(len(cart)):
@@ -60,7 +60,7 @@ def print_cart(cart):
     print(f"Total Price ${total_price}")
 
 
-def print_orders(orders):
+def print_orders(orders: Dict) -> None:
     print("Order History:")
     for user_name in orders:
         #print(orders)
@@ -68,7 +68,7 @@ def print_orders(orders):
         print(f"User: {user_name} - Products: [{' '.join(orders[user_name]['Products'])}] - Total: {orders[user_name]['Price']}")
 
 
-def add_to_cart(catalog, product_name, cart):
+def add_to_cart(catalog: Dict, product_name: str, cart: List) -> None:
     try:
         product = catalog[product_name]
         if product["Stock"] > 0:
@@ -84,7 +84,7 @@ def add_to_cart(catalog, product_name, cart):
         print(f"There is no product called {product_name}")
 
 
-def user_checkout(username, cart, orders):
+def user_checkout(username: str, cart: List, orders: Dict) -> None:
     total_price = calculate_total_price(cart)
     orders[username] = {
         "Products": [product[0] + f"({product[2]})" for product in cart], "Price": total_price
@@ -92,7 +92,7 @@ def user_checkout(username, cart, orders):
     print(f"Price {total_price} Payment successful. Order placed.")
 
 
-def admin_operations(admin_password_dict, user_password_dict, catalog, orders):
+def admin_operations(admin_password_dict: Dict, user_password_dict: Dict, catalog: Dict, orders: Dict) -> None:
     print("Admin logged in successfully.")
     print("Admin logged in. You can use admin commands.")
     while True:
@@ -116,7 +116,7 @@ def admin_operations(admin_password_dict, user_password_dict, catalog, orders):
     return
 
 
-def user_operations(username, user_password_dict, catalog, orders):
+def user_operations(username: str, user_password_dict: Dict, catalog: Dict, orders: Dict) -> None:
     cart = []
     print(f"User {username} logged in successfully")
     print(f"User {username} logged in. You can use user commands.")
