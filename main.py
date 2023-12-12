@@ -73,9 +73,12 @@ def print_cart(cart: List) -> None:
 def print_orders(orders: Dict) -> None:
     print("Order History:")
     for user_name in orders:
-        #print(orders)
-        #print(user_name)
-        print(f"User: {user_name} - Products: [{' '.join(orders[user_name]['Products'])}] - Total: {orders[user_name]['Price']}")
+        # print(orders)
+        # print(user_name)
+        print(
+            f"User: {user_name} - Products: [{' '.join(orders[user_name]['Products'])}]"
+            f" - Total: {orders[user_name]['Price']}"
+        )
 
 
 def add_to_cart(catalog: Dict, product_name: str, cart: List) -> None:
@@ -108,24 +111,27 @@ def admin_operations(admin_password_dict: Dict, user_password_dict: Dict, catalo
     while True:
         command = input("Enter your command: ")
         command_list = command.split()
-        if command_list[0] == "admin" and command_list[1] == "logout":
-            break
-        elif command_list[0] == "admin" and command_list[1] == "register":
-            admin_username = command_list[2]
-            admin_password = command_list[3]
-            admin_password_dict[admin_username] = admin_password
-        elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "catalog":
-            print_catalog(catalog)
-        elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "orders":
-            print_orders(orders)
-        elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "usernames":
-            for user in user_password_dict:
-                print(user)
-        elif command_list[0] == "admin" and command_list[1] == "update_product":
-            catalog[command_list[2]] = {
-                "Price": command_list[3], "Stock": command_list[4], "Description": " ".join(command_list[5:])
-            }
-        else:
+        try:
+            if command_list[0] == "admin" and command_list[1] == "logout":
+                break
+            elif command_list[0] == "admin" and command_list[1] == "register":
+                admin_username = command_list[2]
+                admin_password = command_list[3]
+                admin_password_dict[admin_username] = admin_password
+            elif command_list[0] == "admin" and command_list[1] == "update_product":
+                catalog[command_list[2]] = {
+                    "Price": command_list[3], "Stock": command_list[4], "Description": " ".join(command_list[5:])
+                }
+            elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "catalog":
+                print_catalog(catalog)
+            elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "orders":
+                print_orders(orders)
+            elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "usernames":
+                for user in user_password_dict:
+                    print(user)
+            else:
+                print("You typed wrong thing. Please try again...")
+        except IndexError:
             print("You typed wrong thing. Please try again...")
     return
 
@@ -137,25 +143,28 @@ def user_operations(username: str, user_password_dict: Dict, catalog: Dict, orde
     while True:
         command = input("Enter your command: ")
         command_list = command.split()
-        if command_list[0] == "user" and command_list[1] == "changepass":
-            if user_password_dict[username] == command_list[2]:
-                user_password_dict[username] = command_list[3]
-                print(f"Password changed for user {username} successfully.")
+        try:
+            if command_list[0] == "user" and command_list[1] == "changepass":
+                if user_password_dict[username] == command_list[2]:
+                    user_password_dict[username] = command_list[3]
+                    print(f"Password changed for user {username} successfully.")
+                else:
+                    print("You printed wrong password. Please try again!!!")
+            elif command_list[0] == "user" and command_list[1] == "logout":
+                print("User logged out successfully.")
+                break
+            elif command_list[0] == "user" and command_list[1] == "add_to_cart":
+                add_to_cart(catalog, command_list[2], cart)
+            elif command_list[0] == "user" and command_list[1] == "checkout":
+                user_checkout(username, cart, orders)
+            elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "catalog":
+                print_catalog(catalog)
+            elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "cart":
+                print_cart(cart)
+                cart = []
             else:
-                print("You printed wrong password. Please try again!!!")
-        elif command_list[0] == "user" and command_list[1] == "logout":
-            print("User logged out successfully.")
-            break
-        elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "catalog":
-            print_catalog(catalog)
-        elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "cart":
-            print_cart(cart)
-        elif command_list[0] == "user" and command_list[1] == "add_to_cart":
-            add_to_cart(catalog, command_list[2], cart)
-        elif command_list[0] == "user" and command_list[1] == "checkout":
-            user_checkout(username, cart, orders)
-            cart = []
-        else:
+                print("You typed wrong thing. Please try again...")
+        except IndexError:
             print("You typed wrong thing. Please try again...")
 
 
@@ -198,7 +207,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Admin yeni admin kullanıcı oluşturma
 # Admin yeni user kıllaınıcı oluşturma
 # User logout yaparken siparişiniz duruyordu diye sormak
 # Programı kapatırken her şeyi txt dosyasına kaydetmek
