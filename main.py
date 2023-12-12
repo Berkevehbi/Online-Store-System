@@ -46,6 +46,12 @@ def create_user_account(user_password_dict: Dict, username: str, password: str) 
         print(f"There is only one account with this {username}, choose another username")
 
 
+def create_admin_account(admin_password_dict: Dict, username: str, password: str) -> None:
+    admin_username = username
+    admin_password = password
+    admin_password_dict[admin_username] = admin_password
+
+
 def calculate_total_price(cart: List) -> int:
     total_price = 0
     for product in cart:
@@ -115,9 +121,11 @@ def admin_operations(admin_password_dict: Dict, user_password_dict: Dict, catalo
             if command_list[0] == "admin" and command_list[1] == "logout":
                 break
             elif command_list[0] == "admin" and command_list[1] == "register":
-                admin_username = command_list[2]
-                admin_password = command_list[3]
-                admin_password_dict[admin_username] = admin_password
+                create_admin_account(admin_password_dict, command_list[2], command_list[3])
+                print(f"Successfully added {command_list[2]} admin.")
+            elif command_list[0] == "admin" and command_list[1] == "user_register":
+                create_user_account(user_password_dict, command_list[2], command_list[3])
+                print(f"Successfully added {command_list[2]} user.")
             elif command_list[0] == "admin" and command_list[1] == "update_product":
                 catalog[command_list[2]] = {
                     "Price": command_list[3], "Stock": command_list[4], "Description": " ".join(command_list[5:])
@@ -207,7 +215,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Admin yeni user kıllaınıcı oluşturma
 # User logout yaparken siparişiniz duruyordu diye sormak
 # Programı kapatırken her şeyi txt dosyasına kaydetmek
 # Programı her çalıştırdığında txt dosyasından veri çekmek
