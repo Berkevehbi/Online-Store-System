@@ -110,6 +110,10 @@ def admin_operations(admin_password_dict: Dict, user_password_dict: Dict, catalo
         command_list = command.split()
         if command_list[0] == "admin" and command_list[1] == "logout":
             break
+        elif command_list[0] == "admin" and command_list[1] == "register":
+            admin_username = command_list[2]
+            admin_password = command_list[3]
+            admin_password_dict[admin_username] = admin_password
         elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "catalog":
             print_catalog(catalog)
         elif command_list[0] == "admin" and command_list[1] == "view" and command_list[2] == "orders":
