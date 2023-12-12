@@ -1,0 +1,11 @@
+Admin Passwords:
+admin: admin
+
+User Passwords:
+
+Catalog:
+Laptop: {'Price': 1200, 'Stock': 5, 'Description': 'High-performance laptop with SSD'}
+Smartphone: {'Price': 800, 'Stock': 10, 'Description': 'Latest smartphone model'}
+Tablet: {'Price': 400, 'Stock': 3, 'Description': '10-inch tablet with HD display'}
+
+Orders:

@@ -1,3 +1,5 @@
+import ast
+
 from typing import List, Dict
 
 
@@ -60,10 +62,10 @@ def calculate_total_price(cart: List) -> int:
 
 
 def print_catalog(catalog: Dict) -> None:
-    for item in catalog:
+    for item, value in catalog.items():
         print(
-            f"{item}: {catalog[item]['Price']} - Stock: {catalog[item]['Stock']}"
-            f" - Description: {catalog[item]['Description']}"
+            f"{item}: {value['Price']} - Stock: {value['Stock']}"
+            f" - Description: {value['Description']}"
         )
 
 
@@ -109,6 +111,55 @@ def user_checkout(username: str, cart: List, orders: Dict) -> None:
         "Products": [product[0] + f"({product[2]})" for product in cart], "Price": total_price
     }
     print(f"Price {total_price} Payment successful. Order placed.")
+
+
+def save_all_things(admin_password_dict: Dict, user_password_dict: Dict, catalog: Dict, order: Dict) -> None:
+    with open("database.txt", "w") as file:
+        file.write("Admin Passwords:\n")
+        for key, value in admin_password_dict.items():
+            file.write(f"{key}: {value}\n")
+
+        file.write("\nUser Passwords:\n")
+        for key, value in user_password_dict.items():
+            file.write(f"{key}: {value}\n")
+
+        file.write("\nCatalog:\n")
+        for key, value in catalog.items():
+            file.write(f"{key}: {value}\n")
+
+        file.write("\nOrders:\n")
+        for key, value in order.items():
+            file.write(f"{key}: {value}\n")
+
+
+def get_all_things() -> tuple[Dict, Dict, Dict, Dict]:
+    admin_password_dict = {}
+    user_password_dict = {}
+    catalog = {}
+    order = {}
+    categories = {
+        "Admin Passwords:": admin_password_dict,
+        "User Passwords:": user_password_dict,
+        "Catalog:": catalog,
+        "Orders:": order
+    }
+
+    with open("database.txt", "r") as file:
+        data = file.readlines()
+        current_category = None
+        for line in data:
+            line = line.strip()
+            if line in categories:
+                current_category = line
+            elif ":" in line and current_category:
+                try:
+                    key, value = line.split(": ", 1)
+                    if value.startswith('{'):
+                        value = ast.literal_eval(value)
+                finally:
+                    categories[current_category][key] = value
+    print(admin_password_dict, user_password_dict, catalog, order)
+    return admin_password_dict, user_password_dict, catalog, order
 
 
 def admin_operations(admin_password_dict: Dict, user_password_dict: Dict, catalog: Dict, orders: Dict) -> None:
@@ -159,12 +210,20 @@ def user_operations(username: str, user_password_dict: Dict, catalog: Dict, orde
                 else:
                     print("You printed wrong password. Please try again!!!")
             elif command_list[0] == "user" and command_list[1] == "logout":
-                print("User logged out successfully.")
-                break
+                if not any(cart):
+                    print("User logged out successfully.")
+                    break
+                else:
+                    answer = input("Your cart is not empty, Would you like to do a checkout? (Yes or no)")
+                    if answer.lower() == "yes":
+                        user_checkout(username, cart, orders)
+                    print("User logged out successfully.")
+                    break
             elif command_list[0] == "user" and command_list[1] == "add_to_cart":
                 add_to_cart(catalog, command_list[2], cart)
             elif command_list[0] == "user" and command_list[1] == "checkout":
                 user_checkout(username, cart, orders)
+                cart = []
             elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "catalog":
                 print_catalog(catalog)
             elif command_list[0] == "user" and command_list[1] == "view" and command_list[2] == "cart":
@@ -177,14 +236,11 @@ def user_operations(username: str, user_password_dict: Dict, catalog: Dict, orde
 
 
 def main():
-    admin_password_dict = {"admin": "admin"}
-    user_password_dict = {}
-    catalog = {
-        "Laptop": {"Price": 1200, "Stock": 5, "Description": "High-performance laptop with SSD"},
-        "Smartphone": {"Price": 800, "Stock": 10, "Description": "Latest smartphone model"},
-        "Tablet": {"Price": 400, "Stock": 3, "Description": "10-inch tablet with HD display"}
-    }
+    admin_password = {}
+    user_password = {}
+    catalog = {}
     orders = {}
+    admin_password, user_password, catalog, orders = get_all_things()
     while True:
         print("""
         Please log in or create a new user account.
@@ -195,18 +251,19 @@ def main():
         command_input = input("Enter your command: ")
         input_list = input_to_list(command_input)
         if input_list[0] == "admin" and input_list[1] == "login":
-            if check_user_password(admin_password_dict, input_list[2], input_list[3]):
-                admin_operations(admin_password_dict, user_password_dict, catalog, orders)
+            if check_user_password(admin_password, input_list[2], input_list[3]):
+                admin_operations(admin_password, user_password, catalog, orders)
             else:
                 print("Wrong username or password!!")
         elif input_list[0] == "user" and input_list[1] == "login":
-            if check_user_password(user_password_dict, input_list[2], input_list[3]):
-                user_operations(input_list[2], user_password_dict, catalog, orders)
+            if check_user_password(user_password, input_list[2], input_list[3]):
+                user_operations(input_list[2], user_password, catalog, orders)
             else:
                 print("Wrong username or password!!")
         elif input_list[0] == "user" and input_list[1] == "register":
-            create_user_account(user_password_dict, input_list[2], input_list[3])
+            create_user_account(user_password, input_list[2], input_list[3])
         elif input_list[0] == "exit":
+            save_all_things(admin_password, user_password, catalog, orders)
             break
         else:
             print("You typed wrong thing. Please try again...")
@@ -214,7 +271,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# User logout yaparken siparişiniz duruyordu diye sormak
-# Programı kapatırken her şeyi txt dosyasına kaydetmek
-# Programı her çalıştırdığında txt dosyasından veri çekmek
