@@ -31,9 +31,19 @@ def check_cart_list(cart: List, product_name: str) -> bool:
     return False
 
 
+def check_user_account(user_password_dict: Dict, username: str) -> bool:
+    for i in user_password_dict:
+        if username == i:
+            return False
+    return True
+
+
 def create_user_account(user_password_dict: Dict, username: str, password: str) -> None:
-    user_password_dict[username] = password
-    print(f"User {username} registered successfully. Please login now.")
+    if check_user_account(user_password_dict, username):
+        user_password_dict[username] = password
+        print(f"User {username} registered successfully. Please login now.")
+    else:
+        print(f"There is only one account with this {username}, choose another username")
 
 
 def calculate_total_price(cart: List) -> int:
@@ -184,7 +194,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-# User register ederken kullanici ismi aynı mı kontrol
 # Admin yeni admin kullanıcı oluşturma
 # Admin yeni user kıllaınıcı oluşturma
 # User logout yaparken siparişiniz duruyordu diye sormak
